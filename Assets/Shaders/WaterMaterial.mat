@@ -55,6 +55,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 6c8b55bd392841a48b80d130e6c2d73f, type: 3}
         m_Scale: {x: 10, y: 10}
         m_Offset: {x: 0, y: 0}
+    - _MainTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -75,6 +79,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 34956d78d3cc03d4bac5b288fc48ce1d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _WaterHeightMapTex:
+        m_Texture: {fileID: 2800000, guid: f43eb228458d59c4b99f40bdcc6c11ec, type: 3}
+        m_Scale: {x: 40, y: 40}
+        m_Offset: {x: 0, y: 0}
     - _WaterHeightmapTex:
         m_Texture: {fileID: 2800000, guid: f43eb228458d59c4b99f40bdcc6c11ec, type: 3}
         m_Scale: {x: 40, y: 40}
@@ -85,12 +93,13 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _FoamDistance: 0.57
+    - _FoamMultiplier: 2.5
     - _FoamMutliplier: 2.5
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _MaxHeight: 20
-    - _MaxHeightWater: 0.02
+    - _MaxHeightWater: 7.19
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -98,19 +107,20 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SpeedFoam: 0.03
-    - _SpeedWater1: 0.05
-    - _SpeedWater2: 0.01
+    - _SpeedWater1: 0.005
+    - _SpeedWater2: 0.001
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DeepWaterColor: {r: 0.17856887, g: 0.21368279, b: 0.7169812, a: 0.9647059}
+    - _DeepWaterColor: {r: 0, g: 0, b: 0.36862746, a: 0.9647059}
     - _DirectionFoam: {r: 1.5, g: 0, b: -0.3, a: 0.4}
     - _DirectionNoise: {r: -0.18, g: 0.3, b: 1, a: 1}
     - _DirectionWater1: {r: 0.3, g: -0.1, b: 1, a: 1}
     - _DirectionWater2: {r: -0.4, g: 0.02, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _WaterColor: {r: 0.27735847, g: 0.32360744, b: 1, a: 0.92941177}
+    - _SpeedWater1: {r: 0.3, g: -0.1, b: 1, a: 1}
+    - _WaterColor: {r: 0.105882354, g: 0.4117647, b: 1, a: 0.92941177}
     - _WaterDirection: {r: 0.01, g: 0, b: -0.005, a: 0.03}
   m_BuildTextureStacks: []

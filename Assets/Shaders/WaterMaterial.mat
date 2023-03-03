@@ -64,7 +64,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex:
-        m_Texture: {fileID: 2800000, guid: 2bab83cb3b58a114987006b52178af15, type: 3}
+        m_Texture: {fileID: 2800000, guid: 3d2532b72b0b9c44b9618a289e79464a, type: 3}
         m_Scale: {x: 10, y: 10}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -96,15 +96,17 @@ Material:
     - _Cutoff: 0.161
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FoamDistance: 0.58
-    - _FoamMultiplier: 2.2
+    - _FoamDistance: 0.1
+    - _FoamMultiplier: 5
     - _FoamMutliplier: 2.5
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _MaxDistance: 3.5
     - _MaxHeight: 20
     - _MaxHeightWater: 2
     - _Metallic: 0
+    - _MinDistance: 0.5
     - _Mode: 0
     - _NoiseAmmount: 0.367
     - _OcclusionStrength: 1
@@ -129,6 +131,6 @@ Material:
     - _DirectionWater2: {r: -0.4, g: 0.02, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpeedWater1: {r: 0.3, g: -0.1, b: 1, a: 1}
-    - _WaterColor: {r: 0.20959415, g: 0.37994656, b: 0.7075472, a: 0.92941177}
+    - _WaterColor: {r: 0, g: 0.15686275, b: 0.5764706, a: 0.92941177}
     - _WaterDirection: {r: 0.03, g: 0, b: -0.005, a: 0.03}
   m_BuildTextureStacks: []

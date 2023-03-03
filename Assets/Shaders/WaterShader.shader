@@ -21,15 +21,13 @@
 
 		_FoamDistance("_FoamDistance", Range(0.0, 1.0)) = 0.5
 		_SpeedFoam("_SpeedFoam", Float) = 0.03
-		_DirectionFoam("_DirectionFoam", Vector) = (1.5, 0, -0.3, 0.4)
-		
+		_DirectionFoam("_DirectionFoam", Vector) = (1.5, 0, -0.3, 0.4)		
 		_FoamMultiplier("_FoamMultiplier", Range(0.0, 5.0)) = 2.5
+		_MinDistance("_MinDistance", Float)=1
+		_MaxDistance("_MaxDistance", Float)=1
+
 		_MaxHeightWater("_MaxHeightWater", Float) = 0.02
 		_WaterDirection("_WaterDirection", Vector) = (0.01, 0, -0.005, 0.03)
-		
-		_Cutoff("_Cutoff", Range(0.0, 1.0)) = 0.5
-		//_Seed("_Seed", Float) = 500.0
-		//_NoiseAmmount("_NoiseAmmount", Range(0.0, 1.0)) = 0.001
 	}
 	SubShader
 	{
@@ -74,14 +72,12 @@
 			float _FoamDistance;
 			float _SpeedFoam;
 			float4 _DirectionFoam;
-
 			float _FoamMultiplier;
+			float _MaxDistance;
+			float _MinDistance;
+
 			float _MaxHeightWater;
 			float4 _WaterDirection;
-
-			float _Cutoff;
-			//float _Seed;
-			//float _NoiseAmmount;
 
 			struct appdata
 			{
@@ -175,31 +171,22 @@
 
 				float4 l_FoamTex = tex2D(_FoamTex, i.foamUV);
 				float4 l_Noise = tex2D(_NoiseTex, i.noiseUV);
-				
 
-				//if (l_DepthTex.x < _FoamDistance)
-				//{
+				if (l_DepthTex.x > _FoamDistance)
+				{
 					//l_FoamTex = float4((l_DepthTex.xyz * l_FoamTex.xyz), 1.0);
-
-					
-					//float NoiseX = _Seed * _Time.y * sin(i.noiseUV.x * i.noiseUV.y + _Time.y);
-					//float NoiseY = _Seed * _Time.y * sin(i.noiseUV.x * i.noiseUV.y + _Time.y);
-					//NoiseX = fmod(NoiseX, 8) * fmod(NoiseX, 4);
-					//float DistortX = fmod(NoiseX, _NoiseAmmount);
-					//float DistortY = fmod(NoiseY, _NoiseAmmount + 0.002);
-					//float2 l_UV = i.noiseUV + float2(DistortX, DistortY);
-
-					//float4 l_Noise = tex2D(_NoiseTex, l_UV);
-				
 					
 					l_FoamTex = float4((l_FoamTex.xyz * (1.0 - l_DepthTex) * (l_FoamTex * l_DepthTex)), 1.0);
 					l_Noise = l_Noise > _FoamDistance ? (l_Noise - _FoamDistance) / (1.0 - _FoamDistance) : 0;
 					//l_FoamTex = (l_FoamTex - _FoamDistance) > l_FoamTex ? float4(l_Noise.xxx, 0) * _FoamMultiplier : 0;
-					l_FoamTex *= float4(l_Noise.xxx, 0) * _FoamMultiplier;
+					l_FoamTex *= float4(l_Noise.xxx, 0) * pow(_FoamMultiplier, 3);
+
+					float l_FoamIntensity=1.0;
+					l_FoamIntensity = saturate((l_DepthTex.x-_MinDistance) / (_MaxDistance-_MinDistance));
+					l_FoamTex*=l_FoamIntensity;
 
 					l_MainTex = l_MainTex + l_FoamTex;
-					//clip(l_FoamTex - _Cutoff);
-				//}
+				}
 
 				//return l_MainTex;
 				//return float4(0,0,1, 0.6) + l_MainTex2;

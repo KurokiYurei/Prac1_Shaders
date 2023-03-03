@@ -120,14 +120,15 @@
 
 				v.foamUV = v.uv;
 				v.noiseUV = v.uv;
+
 				//This one controls the x movement --> Dunno if it should work like this ????
 				//float3 l_WaterDirection = _DirectionWater1 * _SpeedWater1 * v.uv.x * cos(_Time.y * _SpeedWater1);
-				float3 l_WaterDirection = _DirectionWater1.x * cos(v.uv.x * _DirectionWater1.y + _Time.y * _SpeedWater1) - _DirectionWater1.x * sin(_Time.y * _SpeedWater1);
+				float3 l_WaterDirection = _DirectionWater1.x * cos(v.uv.x * _DirectionWater1.y + _Time.y * _SpeedWater1) - _DirectionWater1.x * sin(_Time.y * _SpeedWater1);;
 				v.waterUV1 += l_WaterDirection;
 
 				//This one controls the y movement --> Dunno if it should work like this ????
 				//float3 l_WaterDirection2 = _DirectionWater2 * _SpeedWater2 * v.uv.y * sin(_Time.y * _SpeedWater2);
-				float3 l_WaterDirection2 = _DirectionWater2.x * sin(v.uv.y * _DirectionWater1.y + _Time.y * _SpeedWater1) - _DirectionWater2.x * sin(_Time.y * _SpeedWater2);
+				float3 l_WaterDirection2 = _DirectionWater2.x * sin(v.uv.y * _DirectionWater2.y + _Time.y * _SpeedWater1)  - _DirectionWater2.x * cos(_Time.y * _SpeedWater2);
 				v.waterUV2 -= l_WaterDirection2;
 
 
@@ -146,8 +147,8 @@
 				//float3 l_Height = tex2Dlod(_WaterHeightMapTex, float4(v.uv, 0, 0)).xyz * _SpeedWater2 * v.uv.y * cos(_Time.y * _SpeedWater2);
 				//float3 l_Height = _SpeedWater2 * v.uv.y * cos(_Time.y * _SpeedWater2);
 				//float l_Height = tex2Dlod(_WaterHeightMapTex, float4(v.uv, 0, 0)).x * _MaxHeightWater;
-				//float l_Height = tex2Dlod(_WaterHeightMapTex, float4(v.uv, 0.5, 0)) * _MaxHeightWater * cos(_Time.y * _SpeedWater2) ;
-				//o.depthUV.y += l_Height;
+				float l_Height = tex2Dlod(_WaterHeightMapTex, float4(v.uv, 0.5, 0)) * _MaxHeightWater * cos(_Time.y * _SpeedWater2);
+				o.vertex.y += l_Height;
 
 				/////////////////TO HERE IT'S TEST/////////////////////
 
@@ -183,13 +184,13 @@
 				{
 					l_FoamTex = float4((l_DepthTex.xyz * l_FoamTex).xyz, 0.5) * float4(l_Noise.xyz * (1.0 - l_DepthTex).xyz, 1.0);
 					//l_FoamTex = float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)), 0.5);
-					//clip((l_FoamTex.w) - _Cutoff);
+					//clip((l_FoamTex.w) - l_Noise.w);
 				}
 
 				//float4 l_MainTex = tex2D(_MainTex, i.heightUV);
 				//float4 l_Height = tex2D(_WaterHeightMapTex, i.heightUV);
 
-				//return l_MainTex1;
+				//return l_MainTex;
 				//return float4(0,0,1, 0.6) + l_MainTex2;
 				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
 				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0) + l_FoamTex;

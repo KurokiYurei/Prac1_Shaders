@@ -180,12 +180,16 @@
 				float4 l_FoamTex = tex2D(_FoamTex, i.foamUV);
 				float4 l_Noise = tex2D(_NoiseTex, i.noiseUV);
 
-				if (l_DepthTex.x <= _FoamDistance)
-				{
-					l_FoamTex = float4((l_DepthTex.xyz * l_FoamTex).xyz, 0.5) * float4(l_Noise.xyz * (1.0 - l_DepthTex).xyz, 1.0);
-					//l_FoamTex = float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)), 0.5);
-					//clip((l_FoamTex.w) - l_Noise.w);
-				}
+				//if (l_DepthTex.x < _FoamDistance)
+				//{
+					//l_FoamTex = float4((l_DepthTex.xyz * l_FoamTex.xyz), 1.0);
+					l_FoamTex = float4((l_FoamTex.xyz * (1.0 - l_DepthTex) * (l_FoamTex * l_DepthTex)), 1.0);
+					l_Noise = l_Noise > _FoamDistance ? (l_Noise - _FoamDistance) / (1.0 - _FoamDistance) : 0;
+					l_FoamTex *= float4(l_Noise.xxx, 0) * _FoamMultiplier;
+
+					l_MainTex = l_MainTex + l_FoamTex;
+					//clip(l_FoamTex - _Cutoff);
+				//}
 
 				//float4 l_MainTex = tex2D(_MainTex, i.heightUV);
 				//float4 l_Height = tex2D(_WaterHeightMapTex, i.heightUV);
@@ -194,7 +198,7 @@
 				//return float4(0,0,1, 0.6) + l_MainTex2;
 				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
 				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0) + l_FoamTex;
-				return l_MainTex + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0) + l_FoamTex;
+				return l_MainTex + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
 				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0) + float4((l_FoamTex.xyz * (1.0 - l_DepthTex))	, 1.0);
 				//return float4(l_MainTex1.xyz, 0.6) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
 				//return float4(l_MainTex1.xyz, 0.1) + float4(l_MainTex2.xyz, 0.1);

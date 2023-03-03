@@ -89,17 +89,17 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
-    - _Cutoff: 0.161
+    - _Cutoff: 0.033
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FoamDistance: 0.673
-    - _FoamMultiplier: 1.04
+    - _FoamDistance: 0.679
+    - _FoamMultiplier: 1.63
     - _FoamMutliplier: 2.5
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _MaxHeight: 20
-    - _MaxHeightWater: 2
+    - _MaxHeightWater: 2.31
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1

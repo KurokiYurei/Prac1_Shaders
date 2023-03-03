@@ -7,6 +7,7 @@
 		_FoamTex("_FoamTex", 2D) = " " {}
 		_NoiseTex("_NoiseTex", 2D) = "Noise texture" {}
 		_WaterHeightMapTex("_WaterHeightMapTex", 2D) = " " {}
+		_WaterHeatMapTex("_WaterHeatMapTex", 2D) = " " {}
 
 		_DeepWaterColor("_DeepWaterColor", Color) = (1, 1, 0, 0) //R: 46, G: 54, B: 183, A: 246
 		_WaterColor("_WaterColor", Color) = (1, 1, 0, 0) //R: 71, G: 83, B: 255, A: 237
@@ -57,6 +58,7 @@
 			float4 _NoiseTex_ST;
 			sampler2D _WaterHeightMapTex;
 			float4 _WaterHeightMapTex_ST;
+			sampler2D _WaterHeatMapTex;
 
 			float4 _DeepWaterColor;
 			float4 _WaterColor;
@@ -148,7 +150,7 @@
 				o.vertex = mul(UNITY_MATRIX_V, o.vertex);
 				o.vertex = mul(UNITY_MATRIX_P, o.vertex);
 				
-				o.uv = o.vertex;
+				o.uv = float2(0.5, l_HeightNormalized);
 
 				o.waterUV1 = TRANSFORM_TEX(v.waterUV1, _MainTex);
 				o.waterUV2 = TRANSFORM_TEX(v.waterUV2, _MainTex);
@@ -172,6 +174,8 @@
 
 				float4 l_FoamTex = tex2D(_FoamTex, i.foamUV);
 				float4 l_Noise = tex2D(_NoiseTex, i.noiseUV);
+				
+				float4 l_WaterHeightColor = tex2D(_WaterHeatMapTex, i.uv);
 
 				//if (l_DepthTex.x < _FoamDistance)
 				//{
@@ -202,7 +206,7 @@
 				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0) + l_FoamTex;
 				//return float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
 				//return l_MainTex + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
-				return l_MainTex + l_FinalWaterColor;
+				return l_MainTex + l_WaterHeightColor * l_FinalWaterColor;
 				//return float4((l_FoamTex.xyz * (1.0 - l_DepthTex))	, 1.0);
 				//return l_FoamTex;
 			}

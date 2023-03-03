@@ -109,7 +109,6 @@
 			
 				o.vertex = mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1.0));
 				
-				/////////////////FROM HERE/////////////////////
 				v.waterUV1 = v.uv;
 				v.waterUV2 = v.uv;
 
@@ -118,19 +117,15 @@
 				v.foamUV = v.uv;
 				v.noiseUV = v.uv;
 
-				//This one controls the x movement --> Dunno if it should work like this ????
 				float3 l_WaterDirection = _DirectionWater1.x * cos(v.uv.x * _DirectionWater1.y + _Time.y * _SpeedWater1) - _DirectionWater1.x * sin(_Time.y * _SpeedWater1);
 				v.waterUV1 += l_WaterDirection;
 
-				//This one controls the y movement --> Dunno if it should work like this ????
 				float3 l_WaterDirection2 = _DirectionWater2.x * sin(v.uv.y * _DirectionWater2.y + _Time.y * _SpeedWater1)  - _DirectionWater2.x * cos(_Time.y * _SpeedWater2);
 				v.waterUV2 -= l_WaterDirection2;
 				
-				//float3 l_FoamDirection = _DirectionFoam.x * cos(v.uv.y * _DirectionFoam.z + _Time.y * _SpeedFoam);
 				float3 l_FoamDirection = _DirectionFoam.x * _Time.y * _SpeedFoam;
 				v.foamUV += l_FoamDirection;
 				
-				//float3 l_NoiseDirection = _DirectionFoam.z * cos(v.uv.y * _DirectionFoam.w + _Time.y * _SpeedFoam);
 				float3 l_NoiseDirection = _DirectionFoam.x * _Time.y * _SpeedFoam;
 				v.noiseUV += l_NoiseDirection;
 
@@ -142,7 +137,6 @@
 				float l_Height = l_HeightNormalized *_MaxHeightWater;
 				o.vertex.y += l_Height;
 
-				/////////////////TO HERE IT'S TEST/////////////////////
 				o.vertex = mul(UNITY_MATRIX_V, o.vertex);
 				o.vertex = mul(UNITY_MATRIX_P, o.vertex);
 				
@@ -174,28 +168,18 @@
 
 				if (l_DepthTex.x > _FoamDistance)
 				{
-					//l_FoamTex = float4((l_DepthTex.xyz * l_FoamTex.xyz), 1.0);
-					
 					l_FoamTex = float4((l_FoamTex.xyz * (1.0 - l_DepthTex) * (l_FoamTex * l_DepthTex)), 1.0);
 					l_Noise = l_Noise > _FoamDistance ? (l_Noise - _FoamDistance) / (1.0 - _FoamDistance) : 0;
-					//l_FoamTex = (l_FoamTex - _FoamDistance) > l_FoamTex ? float4(l_Noise.xxx, 0) * _FoamMultiplier : 0;
 					l_FoamTex *= float4(l_Noise.xxx, 0) * pow(_FoamMultiplier, 3);
 
-					float l_FoamIntensity=1.0;
-					l_FoamIntensity = saturate((l_DepthTex.x-_MinDistance) / (_MaxDistance-_MinDistance));
-					l_FoamTex*=l_FoamIntensity;
+					float l_FoamIntensity = 1.0;
+					l_FoamIntensity = saturate((l_DepthTex.x - _MinDistance) / (_MaxDistance - _MinDistance));
+					l_FoamTex *= l_FoamIntensity;
 
 					l_MainTex = l_MainTex + l_FoamTex;
 				}
 
-				//return l_MainTex;
-				//return float4(0,0,1, 0.6) + l_MainTex2;
-				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0) + l_FoamTex;
-				//return float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
-				//return l_MainTex + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
 				return l_MainTex + l_FinalWaterColor;
-				//return float4((l_FoamTex.xyz * (1.0 - l_DepthTex))	, 1.0);
-				//return l_FoamTex;
 			}
 			ENDCG
 		}

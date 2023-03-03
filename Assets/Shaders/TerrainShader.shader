@@ -45,7 +45,7 @@
 				o.vertex.y += l_Height;
 				o.vertex = mul(UNITY_MATRIX_V, o.vertex);
 				o.vertex = mul(UNITY_MATRIX_P, o.vertex);
-				o.UV = float2(0.5, l_HeightNormalized);
+					o.UV = float2(0.5, l_HeightNormalized);
 				return o;
 			}
 

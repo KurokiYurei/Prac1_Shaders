@@ -25,6 +25,8 @@
 		_FoamMultiplier("_FoamMultiplier", Range(0.0, 5.0)) = 2.5
 		_MaxHeightWater("_MaxHeightWater", Float) = 0.02
 		_WaterDirection("_WaterDirection", Vector) = (0.01, 0, -0.005, 0.03)
+		
+		_Cutoff("_Cutoff", Range(0.0, 1.0)) = 0.5
 	}
 	SubShader
 	{
@@ -73,6 +75,8 @@
 			float _MaxHeightWater;
 			float4 _WaterDirection;
 
+			float _Cutoff;
+
 			struct appdata
 			{
 				float4 vertex : POSITION;
@@ -82,6 +86,7 @@
 				float2 depthUV: TEXCOORD3;
 				float2 heightUV: TEXCOORD4;
 				float2 foamUV: TEXCOORD5;
+				float2 noiseUV: TEXCOORD6;
 			};
 			struct v2f
 			{
@@ -92,6 +97,7 @@
 				float2 depthUV: TEXCOORD3;
 				float2 heightUV: TEXCOORD4;
 				float2 foamUV: TEXCOORD5;
+				float2 noiseUV: TEXCOORD6;
 			};
 			
 
@@ -111,6 +117,9 @@
 				v.waterUV2 = v.uv;
 
 				v.depthUV = v.uv;
+
+				v.foamUV = v.uv;
+				v.noiseUV = v.uv;
 				//This one controls the x movement --> Dunno if it should work like this ????
 				//float3 l_WaterDirection = _DirectionWater1 * _SpeedWater1 * v.uv.x * cos(_Time.y * _SpeedWater1);
 				float3 l_WaterDirection = _DirectionWater1.x * cos(v.uv.x * _DirectionWater1.y + _Time.y * _SpeedWater1) - _DirectionWater1.x * sin(_Time.y * _SpeedWater1);
@@ -120,18 +129,25 @@
 				//float3 l_WaterDirection2 = _DirectionWater2 * _SpeedWater2 * v.uv.y * sin(_Time.y * _SpeedWater2);
 				float3 l_WaterDirection2 = _DirectionWater2.x * sin(v.uv.y * _DirectionWater1.y + _Time.y * _SpeedWater1) - _DirectionWater2.x * sin(_Time.y * _SpeedWater2);
 				v.waterUV2 -= l_WaterDirection2;
-				
+
+
 				////This method is maybe better ?????????
 				////float3 l_WaterDirection = _DirectionWater1.xyz * _SpeedWater1 * v.uv.y * cos(_Time.y * _SpeedWater1) - _DirectionWater2.xyz * _SpeedWater2 * v.uv.y * sin(_Time.y * _SpeedWater2);
 				//float3 l_WaterDirection3 = _DirectionWater1.x * sin(v.uv.x + _Time.y * _SpeedWater1) + _DirectionWater2.xyz * sin(_Time.y * _SpeedWater2);
 				//o.vertex.xyz += l_WaterDirection3;
+				
+				float3 l_FoamDirection = _DirectionFoam.x * cos(v.uv.y * _DirectionFoam.y + _Time.y * _SpeedFoam)* 0.01;
+				v.foamUV += l_FoamDirection;
+				
+				//float3 l_NoiseDirection = _DirectionFoam.x * cos(v.uv.y * _DirectionFoam.y + _Time.y * _SpeedFoam);
+				//v.noiseUV += l_NoiseDirection;
 
 				//float l_Height = tex2Dlod(_WaterHeightMapTex, float4(v.uv, 0.5, 0)).y * _MaxHeightWater * cos(_Time.y * _SpeedWater2);
 				//float3 l_Height = tex2Dlod(_WaterHeightMapTex, float4(v.uv, 0, 0)).xyz * _SpeedWater2 * v.uv.y * cos(_Time.y * _SpeedWater2);
 				//float3 l_Height = _SpeedWater2 * v.uv.y * cos(_Time.y * _SpeedWater2);
 				//float l_Height = tex2Dlod(_WaterHeightMapTex, float4(v.uv, 0, 0)).x * _MaxHeightWater;
-				float l_Height = tex2Dlod(_WaterHeightMapTex, float4(v.uv, 0.5, 0)) * _MaxHeightWater * cos(_Time.y * _SpeedWater2) ;
-				o.depthUV.y += l_Height;
+				//float l_Height = tex2Dlod(_WaterHeightMapTex, float4(v.uv, 0.5, 0)) * _MaxHeightWater * cos(_Time.y * _SpeedWater2) ;
+				//o.depthUV.y += l_Height;
 
 				/////////////////TO HERE IT'S TEST/////////////////////
 
@@ -145,7 +161,8 @@
 				o.waterUV2 = TRANSFORM_TEX(v.waterUV2, _MainTex);
 				//o.uv = float2(0.5, l_HeightNormalized);
 				o.depthUV = TRANSFORM_TEX(v.depthUV, _WaterDepthTex);
-				o.foamUV = TRANSFORM_TEX(v.uv, _FoamTex);
+				o.foamUV = TRANSFORM_TEX(v.foamUV, _FoamTex);
+				o.noiseUV = TRANSFORM_TEX(v.noiseUV, _NoiseTex);
 
 				return o;
 			}
@@ -154,19 +171,19 @@
 			{
 				float4 l_MainTex1 = tex2D(_MainTex, i.waterUV1);
 				float4 l_MainTex2 = tex2D(_MainTex, i.waterUV2);
-				float4 l_MainTex = l_MainTex1 + l_MainTex2;	
-
-
+				float4 l_MainTex = l_MainTex1 * l_MainTex2;
 
 				float4 l_DepthTex = tex2D(_WaterDepthTex, i.depthUV);
 				float4 l_DeepWaterColor = _DeepWaterColor; //black texture
 				float4 l_WaterColor = _WaterColor; //white texture
 				float4 l_FoamTex = tex2D(_FoamTex, i.foamUV);
+				float4 l_Noise = tex2D(_NoiseTex, i.noiseUV);
 
 				if (l_DepthTex.x <= _FoamDistance)
 				{
-					l_FoamTex = float4((l_DepthTex.xyz * l_FoamTex).xyz, 0.5);
+					l_FoamTex = float4((l_DepthTex.xyz * l_FoamTex).xyz, 0.5) * float4(l_Noise.xyz * (1.0 - l_DepthTex).xyz, 1.0);
 					//l_FoamTex = float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)), 0.5);
+					//clip((l_FoamTex.w) - _Cutoff);
 				}
 
 				//float4 l_MainTex = tex2D(_MainTex, i.heightUV);
@@ -174,7 +191,9 @@
 
 				//return l_MainTex1;
 				//return float4(0,0,1, 0.6) + l_MainTex2;
-				return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
+				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
+				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0) + l_FoamTex;
+				return l_MainTex + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0) + l_FoamTex;
 				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0) + float4((l_FoamTex.xyz * (1.0 - l_DepthTex))	, 1.0);
 				//return float4(l_MainTex1.xyz, 0.6) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
 				//return float4(l_MainTex1.xyz, 0.1) + float4(l_MainTex2.xyz, 0.1);

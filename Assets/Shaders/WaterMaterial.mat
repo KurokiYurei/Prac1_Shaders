@@ -92,8 +92,8 @@ Material:
     - _Cutoff: 0.161
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FoamDistance: 0.673
-    - _FoamMultiplier: 1.04
+    - _FoamDistance: 0.58
+    - _FoamMultiplier: 2.2
     - _FoamMutliplier: 2.5
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -102,8 +102,10 @@ Material:
     - _MaxHeightWater: 2
     - _Metallic: 0
     - _Mode: 0
+    - _NoiseAmmount: 0.367
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _Seed: 484.44
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SpeedFoam: 0.001

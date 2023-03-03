@@ -27,6 +27,8 @@
 		_WaterDirection("_WaterDirection", Vector) = (0.01, 0, -0.005, 0.03)
 		
 		_Cutoff("_Cutoff", Range(0.0, 1.0)) = 0.5
+		//_Seed("_Seed", Float) = 500.0
+		//_NoiseAmmount("_NoiseAmmount", Range(0.0, 1.0)) = 0.001
 	}
 	SubShader
 	{
@@ -76,6 +78,8 @@
 			float4 _WaterDirection;
 
 			float _Cutoff;
+			//float _Seed;
+			//float _NoiseAmmount;
 
 			struct appdata
 			{
@@ -124,15 +128,17 @@
 				float3 l_WaterDirection2 = _DirectionWater2.x * sin(v.uv.y * _DirectionWater2.y + _Time.y * _SpeedWater1)  - _DirectionWater2.x * cos(_Time.y * _SpeedWater2);
 				v.waterUV2 -= l_WaterDirection2;
 				
-				float3 l_FoamDirection = _DirectionFoam.x * cos(v.uv.y * _DirectionFoam.y + _Time.y * _SpeedFoam);
+				//float3 l_FoamDirection = _DirectionFoam.x * cos(v.uv.y * _DirectionFoam.z + _Time.y * _SpeedFoam);
+				float3 l_FoamDirection = _DirectionFoam.x * _Time.y * _SpeedFoam;
 				v.foamUV += l_FoamDirection;
 				
-				float3 l_NoiseDirection = _DirectionFoam.x * cos(v.uv.y * _DirectionFoam.y + _Time.y * _SpeedFoam);
+				//float3 l_NoiseDirection = _DirectionFoam.z * cos(v.uv.y * _DirectionFoam.w + _Time.y * _SpeedFoam);
+				float3 l_NoiseDirection = _DirectionFoam.x * _Time.y * _SpeedFoam;
 				v.noiseUV += l_NoiseDirection;
 
-				float3 l_WaterHeightDirection1=_WaterDirection.w * _Time.y;
-				float3 l_WaterHeightDirection2=_WaterDirection.z * _Time.y;
-				v.heightUV += l_WaterHeightDirection1+l_WaterHeightDirection2;
+				float3 l_WaterHeightDirection1 =_WaterDirection.x * _Time.y;
+				float3 l_WaterHeightDirection2 =_WaterDirection.z * _Time.y;
+				v.heightUV += l_WaterHeightDirection1 + l_WaterHeightDirection2;
 
 				float l_HeightNormalized = tex2Dlod(_WaterHeightMapTex, float4(v.heightUV, 0, 0)).x;
 				float l_Height = l_HeightNormalized *_MaxHeightWater;
@@ -162,14 +168,29 @@
 				float4 l_DepthTex = tex2D(_WaterDepthTex, i.depthUV);
 				float4 l_DeepWaterColor = _DeepWaterColor; //black texture
 				float4 l_WaterColor = _WaterColor; //white texture
+				float4 l_FinalWaterColor = float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
+
 				float4 l_FoamTex = tex2D(_FoamTex, i.foamUV);
 				float4 l_Noise = tex2D(_NoiseTex, i.noiseUV);
 
 				//if (l_DepthTex.x < _FoamDistance)
 				//{
 					//l_FoamTex = float4((l_DepthTex.xyz * l_FoamTex.xyz), 1.0);
+
+					
+					//float NoiseX = _Seed * _Time.y * sin(i.noiseUV.x * i.noiseUV.y + _Time.y);
+					//float NoiseY = _Seed * _Time.y * sin(i.noiseUV.x * i.noiseUV.y + _Time.y);
+					//NoiseX = fmod(NoiseX, 8) * fmod(NoiseX, 4);
+					//float DistortX = fmod(NoiseX, _NoiseAmmount);
+					//float DistortY = fmod(NoiseY, _NoiseAmmount + 0.002);
+					//float2 l_UV = i.noiseUV + float2(DistortX, DistortY);
+
+					//float4 l_Noise = tex2D(_NoiseTex, l_UV);
+				
+					
 					l_FoamTex = float4((l_FoamTex.xyz * (1.0 - l_DepthTex) * (l_FoamTex * l_DepthTex)), 1.0);
 					l_Noise = l_Noise > _FoamDistance ? (l_Noise - _FoamDistance) / (1.0 - _FoamDistance) : 0;
+					//l_FoamTex = (l_FoamTex - _FoamDistance) > l_FoamTex ? float4(l_Noise.xxx, 0) * _FoamMultiplier : 0;
 					l_FoamTex *= float4(l_Noise.xxx, 0) * _FoamMultiplier;
 
 					l_MainTex = l_MainTex + l_FoamTex;
@@ -179,7 +200,9 @@
 				//return l_MainTex;
 				//return float4(0,0,1, 0.6) + l_MainTex2;
 				//return (l_MainTex1 * l_MainTex2) + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0) + l_FoamTex;
-				return l_MainTex + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
+				//return float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
+				//return l_MainTex + float4((l_DeepWaterColor.xyz * (1.0 - l_DepthTex)) + (l_WaterColor.xyz * l_DepthTex), 1.0);
+				return l_MainTex + l_FinalWaterColor;
 				//return float4((l_FoamTex.xyz * (1.0 - l_DepthTex))	, 1.0);
 				//return l_FoamTex;
 			}

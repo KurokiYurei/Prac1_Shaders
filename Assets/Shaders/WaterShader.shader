@@ -25,7 +25,6 @@
 		_FoamMultiplier("_FoamMultiplier", Range(0.0, 5.0)) = 2.5
 		_MaxHeightWater("_MaxHeightWater", Float) = 0.02
 		_WaterDirection("_WaterDirection", Vector) = (0.01, 0, -0.005, 0.03)
-		_SpeedWave("_SpeedWave", Float) = 0.03
 		
 		_Cutoff("_Cutoff", Range(0.0, 1.0)) = 0.5
 	}
@@ -75,7 +74,6 @@
 			float _FoamMultiplier;
 			float _MaxHeightWater;
 			float4 _WaterDirection;
-			float _SpeedWave;
 
 			float _Cutoff;
 
@@ -132,8 +130,9 @@
 				float3 l_NoiseDirection = _DirectionFoam.x * cos(v.uv.y * _DirectionFoam.y + _Time.y * _SpeedFoam);
 				v.noiseUV += l_NoiseDirection;
 
-				float3 l_WaterHeightDirection=_WaterDirection.x * cos(v.uv.x * _WaterDirection.z + _Time.y * _SpeedWave)-_WaterDirection.w * sin(v.uv.x * _WaterDirection.x + _Time.y * _SpeedWave);
-				v.heightUV -= l_WaterHeightDirection;
+				float3 l_WaterHeightDirection1=_WaterDirection.w * _Time.y;
+				float3 l_WaterHeightDirection2=_WaterDirection.z * _Time.y;
+				v.heightUV += l_WaterHeightDirection1+l_WaterHeightDirection2;
 
 				float l_HeightNormalized = tex2Dlod(_WaterHeightMapTex, float4(v.heightUV, 0, 0)).x;
 				float l_Height = l_HeightNormalized *_MaxHeightWater;
